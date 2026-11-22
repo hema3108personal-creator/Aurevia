@@ -8,9 +8,8 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["./../shared/*"]
     }
   },
   "include": ["**/*.ts", "../shared/**/*.ts"]
