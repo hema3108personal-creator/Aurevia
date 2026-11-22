@@ -31,13 +31,15 @@ function setStored(key: string, val: any) {
   } catch (e) {}
 }
 
-// Client-side fallback handler when backend /api is not responding
+// Client-side fallback handler when backend /api is not responding (e.g. on Vercel)
 function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
   const method = (options.method || 'GET').toUpperCase();
   const body = options.body ? JSON.parse(options.body as string) : {};
+  const [cleanEndpoint, queryString] = endpoint.split('?');
+  const queryParams = new URLSearchParams(queryString || '');
 
   // Auth Fallback
-  if (endpoint === '/auth/login') {
+  if (cleanEndpoint === '/auth/login') {
     const email = body.email || '';
     const isAdmin = email.toLowerCase().includes('admin');
     const user = {
@@ -46,7 +48,7 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
       email: email || 'traveler@aurevia.com',
       role: isAdmin ? 'ADMIN' : 'USER',
       phone: '+91 98765 43210',
-      preferences: ['Heritage', 'Eco-tourism', 'Nature'],
+      preferences: ['Nature', 'Historical', 'Eco-friendly'],
     };
     const token = 'mock_jwt_token_' + Date.now();
     setAuthToken(token);
@@ -54,14 +56,14 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     return { success: true, token, user } as unknown as T;
   }
 
-  if (endpoint === '/auth/register') {
+  if (cleanEndpoint === '/auth/register') {
     const user = {
       id: 'usr_' + Date.now(),
       name: body.name || 'Traveler',
       email: body.email,
       role: 'USER',
       phone: body.phone || '',
-      preferences: ['Eco-tourism', 'Heritage'],
+      preferences: ['Eco-friendly', 'Nature'],
     };
     const token = 'mock_jwt_token_' + Date.now();
     setAuthToken(token);
@@ -69,54 +71,209 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     return { success: true, token, user } as unknown as T;
   }
 
-  if (endpoint === '/auth/me') {
+  if (cleanEndpoint === '/auth/me') {
     const user = getStored('aurevia_user', {
       id: 'usr_traveler_1',
       name: 'Aarav Sharma',
       email: 'traveler@aurevia.com',
       role: 'USER',
       phone: '+91 98765 43210',
-      preferences: ['Heritage', 'Nature', 'Eco-tourism'],
+      preferences: ['Nature', 'Historical', 'Eco-friendly'],
     });
     return { success: true, user } as unknown as T;
   }
 
-  // Stations & Trains
-  if (endpoint.startsWith('/stations')) {
-    return { success: true, count: mockStations.length, data: mockStations } as unknown as T;
+  // Stations
+  if (cleanEndpoint === '/stations') {
+    const q = (queryParams.get('q') || '').toLowerCase().trim();
+    let stations = mockStations;
+    if (q) {
+      stations = stations.filter(
+        (s) => s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q)
+      );
+    }
+    return { success: true, count: stations.length, stations, data: stations } as unknown as T;
   }
 
-  if (endpoint.startsWith('/trains/search') || endpoint.startsWith('/trains')) {
+  // Trains Search
+  if (cleanEndpoint === '/trains/search') {
+    const from = (queryParams.get('from') || '').toLowerCase().trim();
+    const to = (queryParams.get('to') || '').toLowerCase().trim();
+    const travelClass = queryParams.get('travelClass') || 'ALL';
+    const sortBy = queryParams.get('sortBy') || 'departure';
+
+    let results = [...mockTrains];
+
+    if (from) {
+      results = results.filter(
+        (t) => t.sourceStationCode.toLowerCase() === from || t.sourceStationName.toLowerCase().includes(from)
+      );
+    }
+
+    if (to) {
+      results = results.filter(
+        (t) => t.destinationStationCode.toLowerCase() === to || t.destinationStationName.toLowerCase().includes(to)
+      );
+    }
+
+    // If no exact source/destination match, return sample express trains so the user always sees results!
+    if (results.length === 0) {
+      results = [...mockTrains];
+    }
+
+    if (travelClass && travelClass !== 'ALL') {
+      results = results.filter((t) => t.classes.some((c) => c.classCode === travelClass));
+    }
+
+    if (sortBy === 'duration') {
+      results.sort((a, b) => a.durationMinutes - b.durationMinutes);
+    } else if (sortBy === 'departure') {
+      results.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+    } else if (sortBy === 'fare') {
+      results.sort((a, b) => {
+        const minA = Math.min(...a.classes.map((c) => c.fare));
+        const minB = Math.min(...b.classes.map((c) => c.fare));
+        return minA - minB;
+      });
+    }
+
     return {
       success: true,
-      count: mockTrains.length,
-      data: mockTrains,
+      count: results.length,
+      trains: results,
+      data: results,
       isSimulated: true,
-      message: 'Simulated IRCTC railway availability inventory',
+      notice: 'Demonstration railway schedule and seat inventory.',
     } as unknown as T;
   }
 
+  if (cleanEndpoint.startsWith('/trains/')) {
+    const id = cleanEndpoint.replace('/trains/', '');
+    const train = mockTrains.find((t) => t.id === id || t.trainNumber === id) || mockTrains[0];
+    return { success: true, train, data: train } as unknown as T;
+  }
+
+  // Destinations Catalog
+  if (cleanEndpoint === '/destinations') {
+    const category = queryParams.get('category') || 'ALL';
+    const state = queryParams.get('state') || 'ALL';
+    const search = (queryParams.get('search') || '').toLowerCase().trim();
+
+    let list = [...mockDestinations];
+
+    if (category !== 'ALL') {
+      list = list.filter((d) => d.category.toLowerCase() === category.toLowerCase());
+    }
+
+    if (state !== 'ALL') {
+      list = list.filter((d) => d.state.toLowerCase() === state.toLowerCase());
+    }
+
+    if (search) {
+      list = list.filter(
+        (d) =>
+          d.name.toLowerCase().includes(search) ||
+          d.state.toLowerCase().includes(search) ||
+          d.description.toLowerCase().includes(search)
+      );
+    }
+
+    return { success: true, count: list.length, destinations: list, data: list } as unknown as T;
+  }
+
+  if (cleanEndpoint.startsWith('/destinations/')) {
+    const id = cleanEndpoint.replace('/destinations/', '');
+    const dest = mockDestinations.find((d) => d.id === id) || mockDestinations[0];
+    return { success: true, destination: dest, data: dest } as unknown as T;
+  }
+
+  // Heritage Sites Catalog
+  if (cleanEndpoint === '/heritage') {
+    const category = queryParams.get('category') || 'ALL';
+    const search = (queryParams.get('search') || '').toLowerCase().trim();
+
+    let list = [...mockHeritageSites];
+
+    if (category !== 'ALL') {
+      list = list.filter((s) => s.category.toLowerCase().includes(category.toLowerCase()));
+    }
+
+    if (search) {
+      list = list.filter(
+        (s) =>
+          s.name.toLowerCase().includes(search) ||
+          s.location.toLowerCase().includes(search) ||
+          s.state.toLowerCase().includes(search)
+      );
+    }
+
+    return { success: true, count: list.length, sites: list, data: list } as unknown as T;
+  }
+
+  if (cleanEndpoint.startsWith('/heritage/')) {
+    const id = cleanEndpoint.replace('/heritage/', '');
+    const site = mockHeritageSites.find((s) => s.id === id) || mockHeritageSites[0];
+    return { success: true, site, data: site } as unknown as T;
+  }
+
+  // Saved Destinations
+  if (cleanEndpoint === '/saved-destinations') {
+    if (method === 'POST') {
+      const saved = getStored<any[]>('aurevia_saved_dest', [
+        { id: 'save_1', userId: body.userId, destinationId: 'dest_munnar', savedAt: new Date().toISOString() },
+      ]);
+      saved.push({ id: 'save_' + Date.now(), userId: body.userId, destinationId: body.destinationId, savedAt: new Date().toISOString() });
+      setStored('aurevia_saved_dest', saved);
+      return { success: true, message: 'Destination saved' } as unknown as T;
+    }
+    const saved = getStored<any[]>('aurevia_saved_dest', [
+      { id: 'save_1', userId: 'usr_traveler_1', destinationId: 'dest_munnar', savedAt: new Date().toISOString() },
+    ]);
+    return { success: true, saved, data: saved } as unknown as T;
+  }
+
+  // Saved Heritage
+  if (cleanEndpoint === '/saved-heritage') {
+    if (method === 'POST') {
+      const saved = getStored<any[]>('aurevia_saved_her', [
+        { id: 'save_her_1', userId: body.userId, heritageId: 'hrt_taj_mahal', savedAt: new Date().toISOString() },
+      ]);
+      saved.push({ id: 'save_her_' + Date.now(), userId: body.userId, heritageId: body.heritageId, savedAt: new Date().toISOString() });
+      setStored('aurevia_saved_her', saved);
+      return { success: true, message: 'Heritage site saved' } as unknown as T;
+    }
+    const saved = getStored<any[]>('aurevia_saved_her', [
+      { id: 'save_her_1', userId: 'usr_traveler_1', heritageId: 'hrt_taj_mahal', savedAt: new Date().toISOString() },
+    ]);
+    return { success: true, saved, data: saved } as unknown as T;
+  }
+
   // Bookings
-  if (endpoint === '/bookings' && method === 'POST') {
+  if (cleanEndpoint === '/bookings' && method === 'POST') {
     const pnr = 'PNR-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(1000 + Math.random() * 9000);
     const bookings = getStored<any[]>('aurevia_bookings', []);
     const newBooking = {
       id: 'bkg_' + Date.now(),
       pnr,
       userId: body.userId || 'usr_traveler_1',
-      trainId: body.trainId || 'trn_12952',
-      trainNumber: body.trainNumber || '12952',
-      trainName: body.trainName || 'New Delhi - Mumbai Rajdhani Express',
-      fromStation: body.fromStation || 'New Delhi (NDLS)',
-      toStation: body.toStation || 'Mumbai Central (BCT)',
+      userEmail: 'traveler@aurevia.com',
+      userName: 'Aarav Sharma',
+      trainId: body.trainId || 'trn_20633',
+      trainNumber: body.trainNumber || '20633',
+      trainName: body.trainName || 'Vande Bharat Express',
+      sourceStationCode: body.sourceStationCode || 'MAS',
+      sourceStationName: body.sourceStationName || 'Chennai Central',
+      destinationStationCode: body.destinationStationCode || 'ERS',
+      destinationStationName: body.destinationStationName || 'Ernakulam Junction (Kochi)',
       journeyDate: body.journeyDate || '2026-12-15',
-      departureTime: body.departureTime || '16:55',
-      arrivalTime: body.arrivalTime || '08:35',
-      travelClass: body.travelClass || '3A',
-      passengers: body.passengers || [{ name: 'Aarav Sharma', age: 29, gender: 'MALE', seatNumber: 'B3-42' }],
-      totalFare: body.totalFare || 2150,
+      departureTime: body.departureTime || '06:00',
+      arrivalTime: body.arrivalTime || '14:30',
+      travelClass: body.travelClass || 'CC',
+      passengers: body.passengers || [{ name: 'Aarav Sharma', age: 29, gender: 'MALE', seatNumber: 'C1-42' }],
+      totalFare: body.totalFare || 1580,
       status: 'CONFIRMED',
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isSimulated: true,
     };
     bookings.unshift(newBooking);
@@ -138,33 +295,39 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     return { success: true, booking: newBooking, pnr } as unknown as T;
   }
 
-  if (endpoint.startsWith('/bookings') && method === 'GET') {
+  if (cleanEndpoint.startsWith('/bookings') && method === 'GET') {
     const defaultBookings = [
       {
         id: 'bkg_sample_1',
         pnr: 'PNR-8429-1940',
         userId: 'usr_traveler_1',
-        trainNumber: '12952',
-        trainName: 'New Delhi - Mumbai Rajdhani Express',
-        fromStation: 'New Delhi (NDLS)',
-        toStation: 'Mumbai Central (BCT)',
+        userEmail: 'traveler@aurevia.com',
+        userName: 'Aarav Sharma',
+        trainId: 'trn_20633',
+        trainNumber: '20633',
+        trainName: 'Vande Bharat Express',
+        sourceStationCode: 'MAS',
+        sourceStationName: 'Chennai Central',
+        destinationStationCode: 'ERS',
+        destinationStationName: 'Ernakulam Junction (Kochi)',
         journeyDate: '2026-12-15',
-        departureTime: '16:55',
-        arrivalTime: '08:35',
-        travelClass: '3A',
-        passengers: [{ name: 'Aarav Sharma', age: 29, gender: 'MALE', seatNumber: 'B2-21' }],
-        totalFare: 2150,
+        departureTime: '06:00',
+        arrivalTime: '14:30',
+        travelClass: 'CC',
+        passengers: [{ name: 'Aarav Sharma', age: 29, gender: 'MALE', seatNumber: 'C1-42' }],
+        totalFare: 1580,
         status: 'CONFIRMED',
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         isSimulated: true,
       },
     ];
     const bookings = getStored<any[]>('aurevia_bookings', defaultBookings);
-    return { success: true, count: bookings.length, data: bookings } as unknown as T;
+    return { success: true, count: bookings.length, bookings, data: bookings } as unknown as T;
   }
 
-  if (endpoint.includes('/cancel') && method === 'POST') {
-    const parts = endpoint.split('/');
+  if (cleanEndpoint.includes('/cancel') && method === 'POST') {
+    const parts = cleanEndpoint.split('/');
     const bookingId = parts[2];
     const bookings = getStored<any[]>('aurevia_bookings', []);
     const b = bookings.find((x) => x.id === bookingId || x.pnr === bookingId);
@@ -173,28 +336,20 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     return { success: true, message: 'Booking cancelled successfully' } as unknown as T;
   }
 
-  // Destinations & Attractions
-  if (endpoint.startsWith('/destinations')) {
-    return { success: true, count: mockDestinations.length, data: mockDestinations } as unknown as T;
-  }
-
-  // Heritage
-  if (endpoint.startsWith('/heritage')) {
-    return { success: true, count: mockHeritageSites.length, data: mockHeritageSites } as unknown as T;
-  }
-
   // Recommendations
-  if (endpoint.startsWith('/recommendations')) {
+  if (cleanEndpoint.startsWith('/recommendations')) {
+    const recs = mockDestinations.slice(0, 4);
     return {
       success: true,
-      data: mockDestinations.slice(0, 4),
-      matchScore: 96,
-      explanation: 'Recommended based on your cultural heritage and eco-tourism affinity.',
+      recommendations: recs,
+      data: recs,
+      matchScore: 98,
+      explanation: 'Recommended based on your cultural heritage and eco-friendly railway preferences.',
     } as unknown as T;
   }
 
   // Itineraries
-  if (endpoint === '/itineraries' && method === 'POST') {
+  if (cleanEndpoint === '/itineraries' && method === 'POST') {
     const itineraries = getStored<any[]>('aurevia_itineraries', []);
     const newItin = {
       id: 'itin_' + Date.now(),
@@ -212,10 +367,10 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     };
     itineraries.unshift(newItin);
     setStored('aurevia_itineraries', itineraries);
-    return { success: true, itinerary: newItin } as unknown as T;
+    return { success: true, itinerary: newItin, data: newItin } as unknown as T;
   }
 
-  if (endpoint.startsWith('/itineraries') && method === 'GET') {
+  if (cleanEndpoint.startsWith('/itineraries') && method === 'GET') {
     const defaultItins = [
       {
         id: 'itin_sample_1',
@@ -233,11 +388,11 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
       },
     ];
     const itineraries = getStored<any[]>('aurevia_itineraries', defaultItins);
-    return { success: true, count: itineraries.length, data: itineraries } as unknown as T;
+    return { success: true, count: itineraries.length, itineraries, data: itineraries } as unknown as T;
   }
 
   // Notifications
-  if (endpoint.startsWith('/notifications')) {
+  if (cleanEndpoint.startsWith('/notifications')) {
     const defaultNotifs = [
       {
         id: 'notif_1',
@@ -257,11 +412,17 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
       },
     ];
     const notifications = getStored<any[]>('aurevia_notifications', defaultNotifs);
-    return { success: true, count: notifications.length, data: notifications, unreadCount: notifications.filter((x) => !x.isRead).length } as unknown as T;
+    return {
+      success: true,
+      count: notifications.length,
+      notifications,
+      data: notifications,
+      unreadCount: notifications.filter((x) => !x.isRead).length,
+    } as unknown as T;
   }
 
   // Admin Analytics & Logs
-  if (endpoint.startsWith('/admin/analytics')) {
+  if (cleanEndpoint.startsWith('/admin/analytics')) {
     return {
       success: true,
       stats: {
@@ -281,7 +442,7 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     } as unknown as T;
   }
 
-  if (endpoint.startsWith('/admin/activity-logs')) {
+  if (cleanEndpoint.startsWith('/admin/activity-logs')) {
     return {
       success: true,
       logs: [
@@ -292,9 +453,13 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     } as unknown as T;
   }
 
-  if (endpoint.startsWith('/users')) {
+  if (cleanEndpoint.startsWith('/users')) {
     return {
       success: true,
+      users: [
+        { id: 'usr_traveler_1', name: 'Aarav Sharma', email: 'traveler@aurevia.com', role: 'USER', isActive: true },
+        { id: 'usr_admin_1', name: 'Priya Nambiar', email: 'admin@aurevia.com', role: 'ADMIN', isActive: true },
+      ],
       data: [
         { id: 'usr_traveler_1', name: 'Aarav Sharma', email: 'traveler@aurevia.com', role: 'USER', isActive: true },
         { id: 'usr_admin_1', name: 'Priya Nambiar', email: 'admin@aurevia.com', role: 'ADMIN', isActive: true },
@@ -302,7 +467,7 @@ function handleFallback<T>(endpoint: string, options: RequestInit = {}): T {
     } as unknown as T;
   }
 
-  if (endpoint.startsWith('/health')) {
+  if (cleanEndpoint.startsWith('/health')) {
     return { success: true, status: 'HEALTHY', message: 'All microservices operational' } as unknown as T;
   }
 
