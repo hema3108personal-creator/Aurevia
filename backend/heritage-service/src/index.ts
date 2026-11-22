@@ -1,0 +1,366 @@
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import * as fs from 'fs';
+import * as path from 'path';
+import { HeritageSite } from '../../../shared/common-types';
+
+const PORT = process.env.PORT || 5005;
+const DATA_FILE = path.resolve(__dirname, '../data/heritage.json');
+
+const dataDir = path.dirname(DATA_FILE);
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+interface SavedHeritageRecord {
+  id: string;
+  userId: string;
+  heritageId: string;
+  savedAt: string;
+}
+
+interface HeritageStore {
+  heritageSites: HeritageSite[];
+  savedHeritage: SavedHeritageRecord[];
+}
+
+function loadData(): HeritageStore {
+  if (!fs.existsSync(DATA_FILE)) {
+    const initialSites: HeritageSite[] = [
+      {
+        id: 'hrt_taj_mahal',
+        name: 'Taj Mahal',
+        location: 'Agra, Uttar Pradesh',
+        state: 'Uttar Pradesh',
+        category: 'UNESCO World Heritage Sites',
+        coverPhotograph: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Commissioned in 1631 by Mughal Emperor Shah Jahan to house the tomb of his favourite wife, Mumtaz Mahal. Built over 22 years by more than 20,000 artisans.',
+        culturalSignificance: 'Universally admired masterpiece of world heritage, representing the pinnacle of Mughal artistic achievement and timeless devotion.',
+        architecturalDetails: 'Constructed from translucent white Makrana marble featuring symmetrical charbagh gardens, pietra dura floral inlays with semi-precious stones, and four freestanding minarets.',
+        visitingInformation: {
+          timings: 'Sunrise to Sunset (Closed on Fridays)',
+          entryFee: '₹50 (Indian citizens), ₹1100 (Foreign tourists)',
+          bestSeason: 'October to March',
+          guidelines: ['Electric vehicles operate from Shilpgram parking.', 'Shoe covers provided at entrance.', 'Strictly zero plastic permitted inside the monument.'],
+        },
+        latitude: 27.1751,
+        longitude: 78.0421,
+        nearestStationCode: 'AGC',
+        nearestStationName: 'Agra Cantt',
+      },
+      {
+        id: 'hrt_hampi',
+        name: 'Group of Monuments at Hampi',
+        location: 'Vijayanagara, Karnataka',
+        state: 'Karnataka',
+        category: 'UNESCO World Heritage Sites',
+        coverPhotograph: 'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Capital of the illustrious Vijayanagara Empire in the 14th century. Described by Portuguese and Persian travellers as one of the largest and most prosperous metropolises in the world.',
+        culturalSignificance: 'Spectacular testimony to Dravidian art and architecture, immortalizing South India’s golden age of sculpture, astronomy, and trade.',
+        architecturalDetails: 'Over 1,600 surviving monuments set in dramatic boulder-strewn terrain, featuring the famed Stone Chariot, musical pillars of Vittala Temple, and Virupaksha shrine.',
+        visitingInformation: {
+          timings: '06:00 AM – 06:00 PM',
+          entryFee: '₹40 (Indian citizens), ₹600 (Foreign tourists)',
+          bestSeason: 'November to February',
+          guidelines: ['Rent eco-friendly bicycles or hire authorized ASI guides.', 'Carry sun protection.'],
+        },
+        latitude: 15.335,
+        longitude: 76.46,
+        nearestStationCode: 'HPT',
+        nearestStationName: 'Hosapete Junction',
+      },
+      {
+        id: 'hrt_mahabalipuram',
+        name: 'Group of Monuments at Mahabalipuram',
+        location: 'Chengalpattu, Tamil Nadu',
+        state: 'Tamil Nadu',
+        category: 'Ancient Temples',
+        coverPhotograph: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Port city of the 7th-century Pallava dynasty, serving as a maritime trading hub connecting ancient India to Southeast Asia.',
+        culturalSignificance: 'Pioneered monolithic rock-cut cave temples and freestanding monolithic rathas that set the foundation for Dravidian temple design.',
+        architecturalDetails: 'Features the dramatic Shore Temple braving the Bay of Bengal surf, Pancha Rathas carved out of single granite boulders, and the colossal bas-relief Descent of the Ganges.',
+        visitingInformation: {
+          timings: '06:00 AM – 06:00 PM',
+          entryFee: '₹40 (Indian citizens), ₹600 (Foreign tourists)',
+          bestSeason: 'November to February',
+          guidelines: ['Walking shoes recommended.', 'Respect coastal preservation guidelines.'],
+        },
+        latitude: 12.6269,
+        longitude: 80.1927,
+        nearestStationCode: 'MAS',
+        nearestStationName: 'Chennai Central',
+      },
+      {
+        id: 'hrt_mysore_palace',
+        name: 'Mysore Palace (Amba Vilas)',
+        location: 'Mysuru, Karnataka',
+        state: 'Karnataka',
+        category: 'Forts and Palaces',
+        coverPhotograph: 'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Seat of the Wadiyar dynasty who ruled the Kingdom of Mysore from 1399 to 1950. Designed by British architect Henry Irwin and completed in 1912.',
+        culturalSignificance: 'Centerpiece of the celebrated 10-day Mysuru Dasara festival, visited by millions of domestic and international cultural travellers annually.',
+        architecturalDetails: 'Indo-Saracenic grandeur blending Hindu, Mughal, Rajput, and Gothic styles with marble domes, stained glass ceilings, teakwood carvings, and 97,000 illumination bulbs.',
+        visitingInformation: {
+          timings: '10:00 AM – 05:30 PM (Illumination Sundays 07:00 PM – 07:45 PM)',
+          entryFee: '₹100 (Adults), ₹50 (Children)',
+          bestSeason: 'October to March',
+          guidelines: ['Footwear deposit available at entrance.', 'Audio guide available in 7 languages.'],
+        },
+        latitude: 12.3051,
+        longitude: 76.6551,
+        nearestStationCode: 'MYS',
+        nearestStationName: 'Mysuru Junction',
+      },
+      {
+        id: 'hrt_jaipur_city_palace',
+        name: 'City Palace, Jaipur',
+        location: 'Jaipur, Rajasthan',
+        state: 'Rajasthan',
+        category: 'Forts and Palaces',
+        coverPhotograph: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Established in 1727 by Maharaja Sawai Jai Singh II alongside the founding of the planned city of Jaipur.',
+        culturalSignificance: 'Living museum and continuing residence of the Jaipur royal family, housing treasured textiles, manuscripts, armouries, and royal carriages.',
+        architecturalDetails: 'Combines Rajput, Mughal, and European architecture with courtyards, Pritam Niwas Chowk peacock gate, Chandra Mahal, and Mubarak Mahal.',
+        visitingInformation: {
+          timings: '09:30 AM – 05:00 PM',
+          entryFee: '₹300 (Indians), ₹700 (Foreigners)',
+          bestSeason: 'October to March',
+          guidelines: ['Special museum passes available for the private royal quarters.'],
+        },
+        latitude: 26.9258,
+        longitude: 75.8237,
+        nearestStationCode: 'JP',
+        nearestStationName: 'Jaipur Junction',
+      },
+      {
+        id: 'hrt_konark_sun_temple',
+        name: 'Konark Sun Temple',
+        location: 'Puri, Odisha',
+        state: 'Odisha',
+        category: 'UNESCO World Heritage Sites',
+        coverPhotograph: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Built in the 13th century by King Narasimhadeva I of the Eastern Ganga dynasty in honour of Surya, the Sun God.',
+        culturalSignificance: 'Pinnacle of Kalinga architecture, also known as the Black Pagoda by ancient European mariners navigating the Bay of Bengal.',
+        architecturalDetails: 'Conceived as a colossal chariot of the Sun God, with 24 carved stone wheels that function as accurate sundials, drawn by seven galloping stone horses.',
+        visitingInformation: {
+          timings: '06:00 AM – 08:00 PM',
+          entryFee: '₹40 (Indian citizens), ₹600 (Foreign tourists)',
+          bestSeason: 'November to February',
+          guidelines: ['Evening light and sound show available in English and Odia.'],
+        },
+        latitude: 19.8876,
+        longitude: 86.0945,
+        nearestStationCode: 'PURI',
+        nearestStationName: 'Puri Railway Station',
+      },
+      {
+        id: 'hrt_qutub_minar',
+        name: 'Qutub Minar & Complex',
+        location: 'Mehrauli, New Delhi',
+        state: 'Delhi',
+        category: 'Historical Monuments',
+        coverPhotograph: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Construction begun by Qutb-ud-din Aibak in 1199 and completed by Iltutmish and Firoz Shah Tughlaq. Represents the beginning of Delhi Sultanate rule.',
+        culturalSignificance: 'Tallest brick minaret in the world at 72.5 metres, surrounded by historical architectural remnants spanning centuries.',
+        architecturalDetails: 'Red sandstone fluted shaft with ornate geometric carving, Quranic calligraphic bands, and the mysterious 1,600-year-old rust-resistant Gupta Iron Pillar.',
+        visitingInformation: {
+          timings: '07:00 AM – 09:00 PM',
+          entryFee: '₹40 (Indian citizens), ₹600 (Foreign tourists)',
+          bestSeason: 'October to March',
+          guidelines: ['Accessible via Delhi Metro Yellow Line (Qutub Minar Station).'],
+        },
+        latitude: 28.5245,
+        longitude: 77.1855,
+        nearestStationCode: 'NDLS',
+        nearestStationName: 'New Delhi',
+      },
+      {
+        id: 'hrt_ajanta_caves',
+        name: 'Ajanta Caves',
+        location: 'Chhatrapati Sambhajinagar, Maharashtra',
+        state: 'Maharashtra',
+        category: 'UNESCO World Heritage Sites',
+        coverPhotograph: 'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=800&q=80',
+        ],
+        historicalBackground: 'Rock-cut Buddhist cave monuments carved in two phases between the 2nd century BCE and 5th century CE under the Satavahana and Vakataka dynasties.',
+        culturalSignificance: 'Universally acclaimed masterpieces of ancient Buddhist religious art, containing expressive fresco paintings depicting Jataka tales.',
+        architecturalDetails: '30 horseshoe-shaped volcanic basalt cliff caves overlooking the Waghur river ravine, comprising prayer halls (chaityas) and monasteries (viharas).',
+        visitingInformation: {
+          timings: '09:00 AM – 05:00 PM (Closed on Mondays)',
+          entryFee: '₹40 (Indian citizens), ₹600 (Foreign tourists)',
+          bestSeason: 'November to March',
+          guidelines: ['Eco-friendly shuttle buses convey visitors from T-Junction parking area to caves.'],
+        },
+        latitude: 20.5519,
+        longitude: 75.7033,
+        nearestStationCode: 'CSMT',
+        nearestStationName: 'Mumbai / Jalgaon',
+      },
+    ];
+
+    const initialStore = { heritageSites: initialSites, savedHeritage: [] };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(initialStore, null, 2), 'utf8');
+    return initialStore;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  } catch (e) {
+    return { heritageSites: [], savedHeritage: [] };
+  }
+}
+
+function saveData(data: HeritageStore): void {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ service: 'heritage-service', status: 'HEALTHY', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/heritage', (req: Request, res: Response) => {
+  const store = loadData();
+  const { category, state, search } = req.query as Record<string, string>;
+  let list = store.heritageSites;
+
+  if (category && category !== 'ALL') {
+    list = list.filter((h) => h.category.toLowerCase() === category.toLowerCase());
+  }
+
+  if (state && state !== 'ALL') {
+    list = list.filter((h) => h.state.toLowerCase() === state.toLowerCase());
+  }
+
+  if (search) {
+    const term = search.toLowerCase();
+    list = list.filter(
+      (h) =>
+        h.name.toLowerCase().includes(term) ||
+        h.location.toLowerCase().includes(term) ||
+        h.culturalSignificance.toLowerCase().includes(term)
+    );
+  }
+
+  res.json({ success: true, count: list.length, sites: list });
+});
+
+app.get('/api/heritage/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  const site = store.heritageSites.find(
+    (h) => h.id === req.params.id || h.name.toLowerCase().replace(/\s+/g, '-') === req.params.id.toLowerCase()
+  );
+  if (!site) return res.status(404).json({ success: false, message: 'Heritage site not found' });
+  res.json({ success: true, site });
+});
+
+// Saved heritage sites
+app.get('/api/saved-heritage', (req: Request, res: Response) => {
+  const store = loadData();
+  const userId = req.query.userId as string;
+  let saved = store.savedHeritage;
+  if (userId) {
+    saved = saved.filter((s) => s.userId === userId);
+  }
+  const siteDetails = saved.map((s) => {
+    const site = store.heritageSites.find((h) => h.id === s.heritageId);
+    return { ...s, site };
+  }).filter((s) => s.site);
+
+  res.json({ success: true, count: siteDetails.length, saved: siteDetails });
+});
+
+app.post('/api/saved-heritage', (req: Request, res: Response) => {
+  const { userId, heritageId } = req.body;
+  if (!userId || !heritageId) {
+    return res.status(400).json({ success: false, message: 'userId and heritageId required' });
+  }
+  const store = loadData();
+  const existing = store.savedHeritage.find((s) => s.userId === userId && s.heritageId === heritageId);
+  if (existing) {
+    return res.json({ success: true, message: 'Already saved', record: existing });
+  }
+
+  const record: SavedHeritageRecord = {
+    id: `sh_${Date.now()}`,
+    userId,
+    heritageId,
+    savedAt: new Date().toISOString(),
+  };
+  store.savedHeritage.push(record);
+  saveData(store);
+  res.status(201).json({ success: true, message: 'Heritage site saved', record });
+});
+
+app.delete('/api/saved-heritage/:heritageId', (req: Request, res: Response) => {
+  const userId = req.query.userId as string || req.body.userId;
+  const store = loadData();
+  store.savedHeritage = store.savedHeritage.filter(
+    (s) => !(s.heritageId === req.params.heritageId && (!userId || s.userId === userId))
+  );
+  saveData(store);
+  res.json({ success: true, message: 'Removed from saved heritage' });
+});
+
+// Admin management
+app.post('/api/heritage', (req: Request, res: Response) => {
+  const store = loadData();
+  const newSite: HeritageSite = {
+    ...req.body,
+    id: `hrt_${Date.now()}`,
+    gallery: req.body.gallery || [],
+  };
+  store.heritageSites.push(newSite);
+  saveData(store);
+  res.status(201).json({ success: true, site: newSite });
+});
+
+app.put('/api/heritage/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  const index = store.heritageSites.findIndex((h) => h.id === req.params.id);
+  if (index === -1) return res.status(404).json({ success: false, message: 'Heritage site not found' });
+  store.heritageSites[index] = { ...store.heritageSites[index], ...req.body };
+  saveData(store);
+  res.json({ success: true, site: store.heritageSites[index] });
+});
+
+app.delete('/api/heritage/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  store.heritageSites = store.heritageSites.filter((h) => h.id !== req.params.id);
+  saveData(store);
+  res.json({ success: true, message: 'Heritage site deleted' });
+});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`[Heritage-Service] Server listening on port ${PORT}`);
+  });
+}
+
+export default app;

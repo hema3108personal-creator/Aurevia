@@ -1,0 +1,317 @@
+// Prisma Schema for AUREVIA (PostgreSQL Relational Design)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+// 1. User & Authentication Service Domain
+model User {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  name         String
+  phone        String?
+  role         UserRole        @default(USER)
+  isActive     Boolean         @default(true)
+  avatarUrl    String?
+  passwordHash String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  preference   UserPreference?
+  bookings     Booking[]
+  itineraries  Itinerary[]
+  notifications Notification[]
+  savedDestinations SavedDestination[]
+  savedHeritage     SavedHeritage[]
+
+  @@map("users")
+}
+
+model UserPreference {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories        String[]
+  travelStyle       String?
+  preferredState    String?
+  availableDays     Int?     @default(3)
+  dietaryPreference String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+// 2. Railway Service Domain
+model Station {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  city      String
+  state     String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("stations")
+}
+
+model Train {
+  id                    String       @id @default(uuid())
+  trainNumber           String       @unique
+  trainName             String
+  sourceStationCode     String
+  sourceStationName     String
+  destinationStationCode String
+  destinationStationName String
+  departureTime         String
+  arrivalTime           String
+  durationMinutes       Int
+  durationFormatted     String
+  operatingDays         String[]
+  distanceKm            Float
+  isSimulated           Boolean      @default(true)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  classes               TrainClass[]
+
+  @@map("trains")
+}
+
+model TrainClass {
+  id             String @id @default(uuid())
+  trainId        String
+  train          Train  @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  classCode      String
+  className      String
+  fare           Float
+  totalSeats     Int
+  availableSeats Int
+
+  @@map("train_classes")
+}
+
+// 3. Reservation Service Domain
+model Booking {
+  id                    String        @id @default(uuid())
+  pnr                   String        @unique
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id])
+  trainNumber           String
+  trainName             String
+  sourceStationCode     String
+  sourceStationName     String
+  destinationStationCode String
+  destinationStationName String
+  journeyDate           String
+  departureTime         String
+  arrivalTime           String
+  travelClass           String
+  totalFare             Float
+  status                BookingStatus @default(CONFIRMED)
+  idempotencyKey        String?       @unique
+  cancellationReason    String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  passengers            Passenger[]
+
+  @@map("bookings")
+}
+
+model Passenger {
+  id             String  @id @default(uuid())
+  bookingId      String
+  booking        Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  name           String
+  age            Int
+  gender         String
+  seatPreference String?
+  seatNumber     String?
+
+  @@map("passengers")
+}
+
+model BookingEventOutbox {
+  id          String   @id @default(uuid())
+  eventType   String
+  payload     Json
+  status      String   @default("PENDING") // PENDING, PUBLISHED, FAILED
+  createdAt   DateTime @default(now())
+  publishedAt DateTime?
+
+  @@map("booking_event_outbox")
+}
+
+// 4. Tourism Service Domain
+model Destination {
+  id                         String             @id @default(uuid())
+  name                       String             @unique
+  state                      String
+  country                    String             @default("India")
+  coverImage                 String
+  galleryImages              String[]
+  description                String
+  highlights                 String[]
+  bestTimeToVisit            String
+  category                   String
+  estimatedVisitDurationDays Int
+  latitude                   Float
+  longitude                  Float
+  ecoFriendlyScore           Int                @default(90)
+  sustainableTips            String[]
+  nearestStationCode         String
+  nearestStationName         String
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
+  attractions                TouristSpot[]
+  savedBy                    SavedDestination[]
+
+  @@map("destinations")
+}
+
+model TouristSpot {
+  id                     String      @id @default(uuid())
+  destinationId          String
+  destination            Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  name                   String
+  category               String
+  description            String
+  highlights             String[]
+  imageUrl               String
+  estimatedDurationHours Float
+  latitude               Float
+  longitude              Float
+  entryFee               Float       @default(0)
+
+  @@map("tourist_spots")
+}
+
+model SavedDestination {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  savedAt       DateTime    @default(now())
+
+  @@unique([userId, destinationId])
+  @@map("saved_destinations")
+}
+
+// 5. Cultural Heritage Domain
+model HeritageSite {
+  id                   String          @id @default(uuid())
+  name                 String          @unique
+  location             String
+  state                String
+  category             String
+  coverPhotograph      String
+  gallery              String[]
+  historicalBackground String
+  culturalSignificance String
+  architecturalDetails String
+  visitingInformation  Json
+  latitude             Float
+  longitude            Float
+  nearestStationCode   String
+  nearestStationName   String
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  savedBy              SavedHeritage[]
+
+  @@map("heritage_sites")
+}
+
+model SavedHeritage {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  heritageId String
+  heritage   HeritageSite @relation(fields: [heritageId], references: [id], onDelete: Cascade)
+  savedAt    DateTime     @default(now())
+
+  @@unique([userId, heritageId])
+  @@map("saved_heritage")
+}
+
+// 6. Recommendation Domain
+model Recommendation {
+  id               String   @id @default(uuid())
+  userId           String
+  destinationId    String
+  destinationName  String
+  destinationImage String
+  category         String
+  matchScore       Int
+  reason           String
+  state            String
+  attractions      String[]
+  createdAt        DateTime @default(now())
+
+  @@map("recommendations")
+}
+
+// 7. Itinerary Domain
+model Itinerary {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  destinationId   String
+  destinationName String
+  startDate       String
+  endDate         String
+  numberOfDays    Int
+  notes           String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  activities      ItineraryActivity[]
+
+  @@map("itineraries")
+}
+
+model ItineraryActivity {
+  id              String    @id @default(uuid())
+  itineraryId     String
+  itinerary       Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  dayNumber       Int
+  activityTitle   String
+  description     String?
+  timeSlot        String?
+  durationMinutes Int
+  attractionId    String?
+  attractionName  String?
+  orderIndex      Int
+
+  @@map("itinerary_activities")
+}
+
+// 8. Notification Domain
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  message     String
+  type        String
+  referenceId String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
+}

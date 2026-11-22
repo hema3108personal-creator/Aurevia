@@ -1,0 +1,256 @@
+version: '3.8'
+
+services:
+  # 1. Message Broker: RabbitMQ with Management UI
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: aurevia-rabbitmq
+    ports:
+      - "5672:5672"     # AMQP protocol
+      - "15672:15672"   # RabbitMQ Management Dashboard
+    environment:
+      RABBITMQ_DEFAULT_USER: aurevia
+      RABBITMQ_DEFAULT_PASS: aurevia123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - aurevia-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Relational Database: PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: aurevia-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: aurevia_user
+      POSTGRES_PASSWORD: aurevia_password
+      POSTGRES_DB: aurevia_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - aurevia-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurevia_user -d aurevia_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 3. User & Authentication Microservice
+  user-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: user-service
+    container_name: aurevia-user-service
+    ports:
+      - "5001:5001"
+    environment:
+      PORT: 5001
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=users
+      JWT_SECRET: aurevia_super_secret_jwt_key_2026
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - aurevia-network
+
+  # 4. Railway Microservice
+  railway-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: railway-service
+    container_name: aurevia-railway-service
+    ports:
+      - "5002:5002"
+    environment:
+      PORT: 5002
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=railway
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 5. Reservation Microservice
+  reservation-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: reservation-service
+    container_name: aurevia-reservation-service
+    ports:
+      - "5003:5003"
+    environment:
+      PORT: 5003
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=reservations
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 6. Tourism Microservice
+  tourism-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: tourism-service
+    container_name: aurevia-tourism-service
+    ports:
+      - "5004:5004"
+    environment:
+      PORT: 5004
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=tourism
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 7. Cultural Heritage Microservice
+  heritage-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: heritage-service
+    container_name: aurevia-heritage-service
+    ports:
+      - "5005:5005"
+    environment:
+      PORT: 5005
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=heritage
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 8. Recommendation Microservice
+  recommendation-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: recommendation-service
+    container_name: aurevia-recommendation-service
+    ports:
+      - "5006:5006"
+    environment:
+      PORT: 5006
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=recommendations
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 9. Itinerary Microservice
+  itinerary-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: itinerary-service
+    container_name: aurevia-itinerary-service
+    ports:
+      - "5007:5007"
+    environment:
+      PORT: 5007
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=itineraries
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 10. Notification Microservice
+  notification-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      args:
+        SERVICE_NAME: notification-service
+    container_name: aurevia-notification-service
+    ports:
+      - "5008:5008"
+    environment:
+      PORT: 5008
+      RABBITMQ_URL: amqp://aurevia:aurevia123@rabbitmq:5672
+      DATABASE_URL: postgresql://aurevia_user:aurevia_password@postgres:5432/aurevia_db?schema=notifications
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - aurevia-network
+
+  # 11. API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.gateway
+    container_name: aurevia-api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      USER_SERVICE_URL: http://user-service:5001
+      RAILWAY_SERVICE_URL: http://railway-service:5002
+      RESERVATION_SERVICE_URL: http://reservation-service:5003
+      TOURISM_SERVICE_URL: http://tourism-service:5004
+      HERITAGE_SERVICE_URL: http://heritage-service:5005
+      RECOMMENDATION_SERVICE_URL: http://recommendation-service:5006
+      ITINERARY_SERVICE_URL: http://itinerary-service:5007
+      NOTIFICATION_SERVICE_URL: http://notification-service:5008
+    depends_on:
+      - user-service
+      - railway-service
+      - reservation-service
+      - tourism-service
+      - heritage-service
+      - recommendation-service
+      - itinerary-service
+      - notification-service
+    networks:
+      - aurevia-network
+
+  # 12. Frontend (React + Vite + Nginx / Node)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/Dockerfile.frontend
+    container_name: aurevia-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - aurevia-network
+
+networks:
+  aurevia-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  pgdata:

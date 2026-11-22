@@ -1,0 +1,117 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_001",
+      "email": "admin@aurevia.com",
+      "name": "Aurevia Administrator",
+      "role": "ADMIN",
+      "isActive": true,
+      "phone": "+91 98765 43210",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "passwordHash": "$2a$10$nfESQpwNb0nTVJwB1NbuIOcAz7jClPBk1UowrLv0XZuPywYruJQly",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "usr_demo_002",
+      "email": "traveler@aurevia.com",
+      "name": "Aarav Sharma",
+      "role": "USER",
+      "isActive": true,
+      "phone": "+91 91234 56789",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "passwordHash": "$2a$10$nfESQpwNb0nTVJwB1NbuIOcVZWH/e8Z.jAwfjF5lxUwswF8C/VsUO",
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "updatedAt": "2026-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "usr_1795343151020_mwas",
+      "email": "test_user_1795343150731@example.com",
+      "name": "Rohan Mehta",
+      "phone": "+91 98765 43210",
+      "role": "USER",
+      "isActive": true,
+      "avatarUrl": "https://api.dicebear.com/7.x/initials/svg?seed=Rohan%20Mehta",
+      "passwordHash": "$2a$10$MpSofTDrlQpwqf3/Z9bCp.a2OQx3pqN/h..nXe1pxrX8uboIvUCnK",
+      "createdAt": "2026-11-22T10:25:51.020Z",
+      "updatedAt": "2026-11-22T10:25:51.020Z"
+    },
+    {
+      "id": "usr_1795346449470_qwnq",
+      "email": "test_user_1795346449347@example.com",
+      "name": "Rohan Mehta",
+      "phone": "+91 98765 43210",
+      "role": "USER",
+      "isActive": true,
+      "avatarUrl": "https://api.dicebear.com/7.x/initials/svg?seed=Rohan%20Mehta",
+      "passwordHash": "$2a$10$vIbwXCWf21x1IITmOZrTlOOD0XizsUnByOdTTgzeL6r/pmTeLxpIq",
+      "createdAt": "2026-11-22T11:20:49.471Z",
+      "updatedAt": "2026-11-22T11:20:49.472Z"
+    },
+    {
+      "id": "usr_1795346810156_91ak",
+      "email": "hema3108personal@gmail.com",
+      "name": "hema",
+      "phone": "",
+      "role": "USER",
+      "isActive": true,
+      "avatarUrl": "https://api.dicebear.com/7.x/initials/svg?seed=hema",
+      "passwordHash": "$2a$10$WL6EGTYz4.2zZsz.otX0Ru54QMcRtPOGw2HI5.XK.Db60GPbraXtu",
+      "createdAt": "2026-11-22T11:26:50.156Z",
+      "updatedAt": "2026-11-22T11:26:50.156Z"
+    }
+  ],
+  "preferences": [
+    {
+      "id": "pref_demo_002",
+      "userId": "usr_demo_002",
+      "categories": [
+        "Nature",
+        "Heritage and History",
+        "Cultural Experiences"
+      ],
+      "travelStyle": "Scenic & Cultural",
+      "preferredState": "Kerala",
+      "availableDays": 3,
+      "dietaryPreference": "Vegetarian",
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "updatedAt": "2026-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "pref_usr_1795343151020_mwas",
+      "userId": "usr_1795343151020_mwas",
+      "categories": [
+        "Nature",
+        "Cultural Experiences"
+      ],
+      "travelStyle": "Relaxed",
+      "availableDays": 3,
+      "createdAt": "2026-11-22T10:25:51.020Z",
+      "updatedAt": "2026-11-22T10:25:51.020Z"
+    },
+    {
+      "id": "pref_usr_1795346449470_qwnq",
+      "userId": "usr_1795346449470_qwnq",
+      "categories": [
+        "Nature",
+        "Cultural Experiences"
+      ],
+      "travelStyle": "Relaxed",
+      "availableDays": 3,
+      "createdAt": "2026-11-22T11:20:49.473Z",
+      "updatedAt": "2026-11-22T11:20:49.473Z"
+    },
+    {
+      "id": "pref_usr_1795346810156_91ak",
+      "userId": "usr_1795346810156_91ak",
+      "categories": [
+        "Nature",
+        "Cultural Experiences"
+      ],
+      "travelStyle": "Relaxed",
+      "availableDays": 3,
+      "createdAt": "2026-11-22T11:26:50.156Z",
+      "updatedAt": "2026-11-22T11:26:50.156Z"
+    }
+  ]
+}

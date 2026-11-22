@@ -1,0 +1,29 @@
+{
+  "name": "aurevia-monorepo",
+  "version": "1.0.0",
+  "description": "AUREVIA – Event-Driven Microservices Architecture for a Smart Tourism and Railway Reservation System",
+  "private": true,
+  "scripts": {
+    "start:backend": "cd backend && tsx start-all.ts",
+    "start:frontend": "cd frontend && npm run dev",
+    "start": "cd backend && tsx production-server.ts",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && tsx ../tests/run-tests.ts",
+    "seed": "cd backend && tsx seed-all.ts"
+  },
+  "keywords": [
+    "smart-tourism",
+    "railway-reservation",
+    "microservices",
+    "event-driven",
+    "rabbitmq",
+    "react",
+    "typescript",
+    "capstone"
+  ],
+  "author": "AUREVIA Engineering Team",
+  "license": "MIT",
+  "dependencies": {
+    "isomorphic-git": "^1.44.18"
+  }
+}

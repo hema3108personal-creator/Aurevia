@@ -1,0 +1,19 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy root workspace and backend package definitions
+COPY backend/package*.json ./backend/
+COPY shared ./shared/
+
+WORKDIR /app/backend
+RUN npm install --no-audit --no-fund
+
+COPY backend .
+
+ARG SERVICE_NAME
+ENV SERVICE_DIR=${SERVICE_NAME}
+
+EXPOSE 5001-5008
+
+CMD ["sh", "-c", "npx tsx ${SERVICE_DIR}/src/index.ts"]

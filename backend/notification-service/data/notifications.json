@@ -1,0 +1,110 @@
+{
+  "notifications": [
+    {
+      "id": "notif_1795346810161_f1i9",
+      "userId": "usr_1795346810156_91ak",
+      "title": "Welcome to AUREVIA",
+      "message": "Hello hema! Welcome to AUREVIA – The World, Seamlessly Connected. Begin exploring destinations and simulated train journeys.",
+      "type": "SYSTEM",
+      "isRead": false,
+      "createdAt": "2026-11-22T11:26:50.161Z"
+    },
+    {
+      "id": "notif_1795346450031_wo6h",
+      "userId": "usr_1795346449470_qwnq",
+      "title": "Booking Cancelled: PNR-2554-7155",
+      "message": "Your reservation for train 20633 on 2026-12-10 has been cancelled. Reason: Schedule update.",
+      "type": "BOOKING_CANCELLATION",
+      "referenceId": "bkg_1795346449574_1cdd9",
+      "isRead": false,
+      "createdAt": "2026-11-22T11:20:50.031Z"
+    },
+    {
+      "id": "notif_1795346450025_iy21",
+      "userId": "usr_1795346449470_qwnq",
+      "title": "Itinerary Planned: Western Ghats Scenic Journey",
+      "message": "Your 3-day itinerary for Munnar (2026-12-10 to 2026-12-13) is saved.",
+      "type": "ITINERARY",
+      "referenceId": "itin_1795346450023_ew4k",
+      "isRead": false,
+      "createdAt": "2026-11-22T11:20:50.025Z"
+    },
+    {
+      "id": "notif_1795346449577_av2g",
+      "userId": "usr_1795346449470_qwnq",
+      "title": "Booking Confirmed: PNR-2554-7155",
+      "message": "Your reservation on 20633 Vande Bharat Express from Chennai Central to Ernakulam Junction (Kochi) on 2026-12-10 is confirmed. Total Fare: ₹1580.",
+      "type": "BOOKING_CONFIRMATION",
+      "referenceId": "bkg_1795346449574_1cdd9",
+      "isRead": false,
+      "createdAt": "2026-11-22T11:20:49.577Z"
+    },
+    {
+      "id": "notif_1795346449477_fiya",
+      "userId": "usr_1795346449470_qwnq",
+      "title": "Welcome to AUREVIA",
+      "message": "Hello Rohan Mehta! Welcome to AUREVIA – The World, Seamlessly Connected. Begin exploring destinations and simulated train journeys.",
+      "type": "SYSTEM",
+      "isRead": false,
+      "createdAt": "2026-11-22T11:20:49.477Z"
+    },
+    {
+      "id": "notif_1795343151591_yo47",
+      "userId": "usr_1795343151020_mwas",
+      "title": "Booking Cancelled: PNR-4493-3693",
+      "message": "Your reservation for train 20633 on 2026-12-10 has been cancelled. Reason: Schedule update.",
+      "type": "BOOKING_CANCELLATION",
+      "referenceId": "bkg_1795343151129_bkdte",
+      "isRead": false,
+      "createdAt": "2026-11-22T10:25:51.591Z"
+    },
+    {
+      "id": "notif_1795343151583_4tdk",
+      "userId": "usr_1795343151020_mwas",
+      "title": "Itinerary Planned: Western Ghats Scenic Journey",
+      "message": "Your 3-day itinerary for Munnar (2026-12-10 to 2026-12-13) is saved.",
+      "type": "ITINERARY",
+      "referenceId": "itin_1795343151580_nlot",
+      "isRead": false,
+      "createdAt": "2026-11-22T10:25:51.583Z"
+    },
+    {
+      "id": "notif_1795343151132_u5v9",
+      "userId": "usr_1795343151020_mwas",
+      "title": "Booking Confirmed: PNR-4493-3693",
+      "message": "Your reservation on 20633 Vande Bharat Express from Chennai Central to Ernakulam Junction (Kochi) on 2026-12-10 is confirmed. Total Fare: ₹1580.",
+      "type": "BOOKING_CONFIRMATION",
+      "referenceId": "bkg_1795343151129_bkdte",
+      "isRead": false,
+      "createdAt": "2026-11-22T10:25:51.132Z"
+    },
+    {
+      "id": "notif_1795343151027_iyen",
+      "userId": "usr_1795343151020_mwas",
+      "title": "Welcome to AUREVIA",
+      "message": "Hello Rohan Mehta! Welcome to AUREVIA – The World, Seamlessly Connected. Begin exploring destinations and simulated train journeys.",
+      "type": "SYSTEM",
+      "isRead": false,
+      "createdAt": "2026-11-22T10:25:51.027Z"
+    },
+    {
+      "id": "notif_welcome_001",
+      "userId": "usr_demo_002",
+      "title": "Welcome to AUREVIA",
+      "message": "Welcome to AUREVIA! Discover cultural heritage, seamless railway journeys, and sustainable travel.",
+      "type": "SYSTEM",
+      "isRead": false,
+      "createdAt": "2026-11-20T10:00:00.000Z"
+    },
+    {
+      "id": "notif_sample_booking",
+      "userId": "usr_demo_002",
+      "title": "Booking Confirmed: PNR-8492-3104",
+      "message": "Your journey on 20633 Vande Bharat Express (Chennai Central -> Ernakulam Junction) for 2026-12-05 is confirmed.",
+      "type": "BOOKING_CONFIRMATION",
+      "referenceId": "bkg_sample_101",
+      "isRead": false,
+      "createdAt": "2026-11-20T10:05:00.000Z"
+    }
+  ]
+}

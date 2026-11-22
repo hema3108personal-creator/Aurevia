@@ -1,0 +1,197 @@
+{
+  "recommendations": [
+    {
+      "id": "rec_1795346450013_dest_munnar",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "destinationImage": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 99,
+      "reason": "Recommended because it matches your interest in Nature, and features attractions matching Nature, and is located in your preferred state of Kerala, and ideally fits your 3-day schedule, and features a high sustainability score (94/100).",
+      "state": "Kerala",
+      "attractions": [
+        "Eravikulam National Park",
+        "KDHP Tea Museum & Factory",
+        "Mattupetty Dam & Lake"
+      ],
+      "createdAt": "2026-11-22T11:20:50.013Z"
+    },
+    {
+      "id": "rec_1795346450014_dest_ooty",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_ooty",
+      "destinationName": "Ooty (Udhagamandalam)",
+      "destinationImage": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 99,
+      "reason": "Recommended because it matches your interest in Nature, and features attractions matching Nature, and ideally fits your 3-day schedule, and features a high sustainability score (92/100).",
+      "state": "Tamil Nadu",
+      "attractions": [
+        "Nilgiri Mountain Railway",
+        "Government Botanical Gardens"
+      ],
+      "createdAt": "2026-11-22T11:20:50.014Z"
+    },
+    {
+      "id": "rec_1795346450014_dest_kodaikanal",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_kodaikanal",
+      "destinationName": "Kodaikanal",
+      "destinationImage": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 85,
+      "reason": "Recommended because it matches your interest in Nature, and comfortably accommodates a 3-day itinerary.",
+      "state": "Tamil Nadu",
+      "attractions": [],
+      "createdAt": "2026-11-22T11:20:50.014Z"
+    },
+    {
+      "id": "rec_1795346450014_dest_jaipur",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_jaipur",
+      "destinationName": "Jaipur",
+      "destinationImage": "https://images.unsplash.com/photo-1603262110263-fb010d6e59f4?auto=format&fit=crop&w=1200&q=80",
+      "category": "Historical",
+      "matchScore": 60,
+      "reason": "Recommended because it ideally fits your 3-day schedule.",
+      "state": "Rajasthan",
+      "attractions": [
+        "Amer Fort",
+        "Hawa Mahal (Palace of Winds)"
+      ],
+      "createdAt": "2026-11-22T11:20:50.014Z"
+    },
+    {
+      "id": "rec_1795346450014_dest_mysuru",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_mysuru",
+      "destinationName": "Mysuru",
+      "destinationImage": "https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=1200&q=80",
+      "category": "Cultural",
+      "matchScore": 60,
+      "reason": "Recommended because it comfortably accommodates a 3-day itinerary, and features a high sustainability score (91/100).",
+      "state": "Karnataka",
+      "attractions": [],
+      "createdAt": "2026-11-22T11:20:50.014Z"
+    },
+    {
+      "id": "rec_1795346450014_dest_manali",
+      "userId": "usr_1795346449470_qwnq",
+      "destinationId": "dest_manali",
+      "destinationName": "Manali",
+      "destinationImage": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1200&q=80",
+      "category": "Adventure",
+      "matchScore": 60,
+      "reason": "Recommended because it comfortably accommodates a 3-day itinerary, and features a high sustainability score (90/100).",
+      "state": "Himachal Pradesh",
+      "attractions": [],
+      "createdAt": "2026-11-22T11:20:50.014Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_munnar",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "destinationImage": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 99,
+      "reason": "Recommended because it matches your interest in Nature, and features attractions matching Nature, and is located in your preferred state of Kerala, and ideally fits your 3-day schedule, and features a high sustainability score (94/100).",
+      "state": "Kerala",
+      "attractions": [
+        "Eravikulam National Park",
+        "KDHP Tea Museum & Factory",
+        "Mattupetty Dam & Lake"
+      ],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_ooty",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_ooty",
+      "destinationName": "Ooty (Udhagamandalam)",
+      "destinationImage": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 99,
+      "reason": "Recommended because it matches your interest in Nature, and features attractions matching Nature, and ideally fits your 3-day schedule, and features a high sustainability score (92/100).",
+      "state": "Tamil Nadu",
+      "attractions": [
+        "Nilgiri Mountain Railway",
+        "Government Botanical Gardens"
+      ],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_kodaikanal",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_kodaikanal",
+      "destinationName": "Kodaikanal",
+      "destinationImage": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80",
+      "category": "Nature",
+      "matchScore": 85,
+      "reason": "Recommended because it matches your interest in Nature, and comfortably accommodates a 3-day itinerary.",
+      "state": "Tamil Nadu",
+      "attractions": [],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_jaipur",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_jaipur",
+      "destinationName": "Jaipur",
+      "destinationImage": "https://images.unsplash.com/photo-1603262110263-fb010d6e59f4?auto=format&fit=crop&w=1200&q=80",
+      "category": "Historical",
+      "matchScore": 60,
+      "reason": "Recommended because it ideally fits your 3-day schedule.",
+      "state": "Rajasthan",
+      "attractions": [
+        "Amer Fort",
+        "Hawa Mahal (Palace of Winds)"
+      ],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_mysuru",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_mysuru",
+      "destinationName": "Mysuru",
+      "destinationImage": "https://images.unsplash.com/photo-1600100397608-f010f4439c2c?auto=format&fit=crop&w=1200&q=80",
+      "category": "Cultural",
+      "matchScore": 60,
+      "reason": "Recommended because it comfortably accommodates a 3-day itinerary, and features a high sustainability score (91/100).",
+      "state": "Karnataka",
+      "attractions": [],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_1795343151570_dest_manali",
+      "userId": "usr_1795343151020_mwas",
+      "destinationId": "dest_manali",
+      "destinationName": "Manali",
+      "destinationImage": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1200&q=80",
+      "category": "Adventure",
+      "matchScore": 60,
+      "reason": "Recommended because it comfortably accommodates a 3-day itinerary, and features a high sustainability score (90/100).",
+      "state": "Himachal Pradesh",
+      "attractions": [],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    },
+    {
+      "id": "rec_init_001",
+      "userId": "usr_demo_002",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "destinationImage": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
+      "category": "Nature",
+      "matchScore": 96,
+      "reason": "Recommended because you selected Nature and Cultural Experiences and have 3 days available for a scenic mountain retreat.",
+      "state": "Kerala",
+      "attractions": [
+        "Eravikulam National Park",
+        "KDHP Tea Museum & Factory",
+        "Mattupetty Dam"
+      ],
+      "createdAt": "2026-11-22T10:25:51.570Z"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "itineraries": [
+    {
+      "id": "itin_1795346450023_ew4k",
+      "userId": "usr_1795346449470_qwnq",
+      "title": "Western Ghats Scenic Journey",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "startDate": "2026-12-10",
+      "endDate": "2026-12-13",
+      "numberOfDays": 3,
+      "notes": "",
+      "activities": [
+        {
+          "dayNumber": 1,
+          "activityTitle": "Arrival & Tea Tasting",
+          "durationMinutes": 180,
+          "orderIndex": 0
+        }
+      ],
+      "createdAt": "2026-11-22T11:20:50.023Z",
+      "updatedAt": "2026-11-22T11:20:50.023Z"
+    },
+    {
+      "id": "itin_1795343151580_nlot",
+      "userId": "usr_1795343151020_mwas",
+      "title": "Western Ghats Scenic Journey",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "startDate": "2026-12-10",
+      "endDate": "2026-12-13",
+      "numberOfDays": 3,
+      "notes": "",
+      "activities": [
+        {
+          "dayNumber": 1,
+          "activityTitle": "Arrival & Tea Tasting",
+          "durationMinutes": 180,
+          "orderIndex": 0
+        }
+      ],
+      "createdAt": "2026-11-22T10:25:51.580Z",
+      "updatedAt": "2026-11-22T10:25:51.580Z"
+    },
+    {
+      "id": "itin_sample_001",
+      "userId": "usr_demo_002",
+      "title": "Munnar & Western Ghats Scenic Retreat",
+      "destinationId": "dest_munnar",
+      "destinationName": "Munnar",
+      "startDate": "2026-12-05",
+      "endDate": "2026-12-08",
+      "numberOfDays": 3,
+      "notes": "Pack light rain jacket and comfortable walking shoes for high altitude tea trails.",
+      "createdAt": "2026-11-20T12:00:00.000Z",
+      "updatedAt": "2026-11-20T12:00:00.000Z",
+      "activities": [
+        {
+          "id": "act_101",
+          "dayNumber": 1,
+          "activityTitle": "Arrival & Scenic Ghat Journey",
+          "description": "Arrive via Vande Bharat Express at Ernakulam, transfer to Munnar hill station through Cheeyappara waterfalls.",
+          "timeSlot": "09:00 AM – 01:00 PM",
+          "durationMinutes": 240,
+          "orderIndex": 0
+        },
+        {
+          "id": "act_102",
+          "dayNumber": 1,
+          "activityTitle": "KDHP Tea Museum & Factory Walk",
+          "description": "Guided historical tour of Orthodox tea manufacturing and fresh tea tasting.",
+          "timeSlot": "03:00 PM – 05:00 PM",
+          "durationMinutes": 120,
+          "attractionId": "spot_tea_museum",
+          "attractionName": "KDHP Tea Museum & Factory",
+          "orderIndex": 1
+        },
+        {
+          "id": "act_103",
+          "dayNumber": 2,
+          "activityTitle": "Eravikulam National Park Safari",
+          "description": "Early morning safari to spot Nilgiri Tahr and view Anamudi Peak across shola forests.",
+          "timeSlot": "08:00 AM – 11:30 AM",
+          "durationMinutes": 210,
+          "attractionId": "spot_eravikulam",
+          "attractionName": "Eravikulam National Park",
+          "orderIndex": 0
+        },
+        {
+          "id": "act_104",
+          "dayNumber": 2,
+          "activityTitle": "Mattupetty Lake & Dam Reflection Point",
+          "description": "Relaxing lakeside stroll, solar boating, and photography of misty tea plantation slopes.",
+          "timeSlot": "02:00 PM – 04:30 PM",
+          "durationMinutes": 150,
+          "attractionId": "spot_mattupetty",
+          "attractionName": "Mattupetty Dam & Lake",
+          "orderIndex": 1
+        },
+        {
+          "id": "act_105",
+          "dayNumber": 3,
+          "activityTitle": "Traditional Spice Plantation Trail & Return",
+          "description": "Walk through organic cardamom and vanilla gardens, followed by return rail transfer.",
+          "timeSlot": "10:00 AM – 02:00 PM",
+          "durationMinutes": 240,
+          "orderIndex": 0
+        }
+      ]
+    }
+  ]
+}

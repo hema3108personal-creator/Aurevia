@@ -1,0 +1,177 @@
+{
+  "bookings": [
+    {
+      "id": "bkg_1795346449574_1cdd9",
+      "pnr": "PNR-2554-7155",
+      "userId": "usr_1795346449470_qwnq",
+      "userEmail": "test_user_1795346449347@example.com",
+      "userName": "Rohan Mehta",
+      "trainId": "trn_20633",
+      "trainNumber": "20633",
+      "trainName": "Vande Bharat Express",
+      "sourceStationCode": "MAS",
+      "sourceStationName": "Chennai Central",
+      "destinationStationCode": "ERS",
+      "destinationStationName": "Ernakulam Junction (Kochi)",
+      "journeyDate": "2026-12-10",
+      "departureTime": "06:00",
+      "arrivalTime": "14:30",
+      "travelClass": "CC",
+      "passengers": [
+        {
+          "name": "Rohan Mehta",
+          "age": 31,
+          "gender": "MALE",
+          "seatPreference": "WINDOW",
+          "seatNumber": "C1-43"
+        }
+      ],
+      "totalFare": 1580,
+      "status": "CANCELLED",
+      "idempotencyKey": "idem_test_1795346449571",
+      "createdAt": "2026-11-22T11:20:49.574Z",
+      "updatedAt": "2026-11-22T11:20:50.029Z",
+      "cancellationReason": "Schedule update"
+    },
+    {
+      "id": "bkg_1795343151129_bkdte",
+      "pnr": "PNR-4493-3693",
+      "userId": "usr_1795343151020_mwas",
+      "userEmail": "test_user_1795343150731@example.com",
+      "userName": "Rohan Mehta",
+      "trainId": "trn_20633",
+      "trainNumber": "20633",
+      "trainName": "Vande Bharat Express",
+      "sourceStationCode": "MAS",
+      "sourceStationName": "Chennai Central",
+      "destinationStationCode": "ERS",
+      "destinationStationName": "Ernakulam Junction (Kochi)",
+      "journeyDate": "2026-12-10",
+      "departureTime": "06:00",
+      "arrivalTime": "14:30",
+      "travelClass": "CC",
+      "passengers": [
+        {
+          "name": "Rohan Mehta",
+          "age": 31,
+          "gender": "MALE",
+          "seatPreference": "WINDOW",
+          "seatNumber": "C3-35"
+        }
+      ],
+      "totalFare": 1580,
+      "status": "CANCELLED",
+      "idempotencyKey": "idem_test_1795343151126",
+      "createdAt": "2026-11-22T10:25:51.129Z",
+      "updatedAt": "2026-11-22T10:25:51.588Z",
+      "cancellationReason": "Schedule update"
+    },
+    {
+      "id": "bkg_sample_101",
+      "pnr": "PNR-8492-3104",
+      "userId": "usr_demo_002",
+      "userEmail": "traveler@aurevia.com",
+      "userName": "Aarav Sharma",
+      "trainId": "trn_20633",
+      "trainNumber": "20633",
+      "trainName": "Vande Bharat Express",
+      "sourceStationCode": "MAS",
+      "sourceStationName": "Chennai Central",
+      "destinationStationCode": "ERS",
+      "destinationStationName": "Ernakulam Junction (Kochi)",
+      "journeyDate": "2026-12-05",
+      "departureTime": "06:00",
+      "arrivalTime": "14:30",
+      "travelClass": "CC",
+      "passengers": [
+        {
+          "name": "Aarav Sharma",
+          "age": 29,
+          "gender": "MALE",
+          "seatPreference": "WINDOW",
+          "seatNumber": "C3-24"
+        },
+        {
+          "name": "Pooja Sharma",
+          "age": 27,
+          "gender": "FEMALE",
+          "seatPreference": "WINDOW",
+          "seatNumber": "C3-25"
+        }
+      ],
+      "totalFare": 3160,
+      "status": "CONFIRMED",
+      "idempotencyKey": "idem_init_sample_101",
+      "createdAt": "2026-11-20T10:00:00.000Z",
+      "updatedAt": "2026-11-20T10:00:00.000Z"
+    }
+  ],
+  "outbox": [
+    {
+      "id": "outbox_1795343151129",
+      "eventType": "booking.confirmed",
+      "payload": {
+        "bookingId": "bkg_1795343151129_bkdte",
+        "pnr": "PNR-4493-3693",
+        "userId": "usr_1795343151020_mwas",
+        "trainId": "trn_20633",
+        "trainNumber": "20633",
+        "trainName": "Vande Bharat Express",
+        "fromStation": "Chennai Central",
+        "toStation": "Ernakulam Junction (Kochi)",
+        "journeyDate": "2026-12-10",
+        "departureTime": "06:00",
+        "arrivalTime": "14:30",
+        "travelClass": "CC",
+        "passengers": [
+          {
+            "name": "Rohan Mehta",
+            "age": 31,
+            "gender": "MALE",
+            "seatPreference": "WINDOW",
+            "seatNumber": "C3-35"
+          }
+        ],
+        "totalFare": 1580,
+        "status": "CONFIRMED",
+        "timestamp": "2026-11-22T10:25:51.129Z"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2026-11-22T10:25:51.129Z",
+      "publishedAt": "2026-11-22T10:25:51.133Z"
+    },
+    {
+      "id": "outbox_1795346449574",
+      "eventType": "booking.confirmed",
+      "payload": {
+        "bookingId": "bkg_1795346449574_1cdd9",
+        "pnr": "PNR-2554-7155",
+        "userId": "usr_1795346449470_qwnq",
+        "trainId": "trn_20633",
+        "trainNumber": "20633",
+        "trainName": "Vande Bharat Express",
+        "fromStation": "Chennai Central",
+        "toStation": "Ernakulam Junction (Kochi)",
+        "journeyDate": "2026-12-10",
+        "departureTime": "06:00",
+        "arrivalTime": "14:30",
+        "travelClass": "CC",
+        "passengers": [
+          {
+            "name": "Rohan Mehta",
+            "age": 31,
+            "gender": "MALE",
+            "seatPreference": "WINDOW",
+            "seatNumber": "C1-43"
+          }
+        ],
+        "totalFare": 1580,
+        "status": "CONFIRMED",
+        "timestamp": "2026-11-22T11:20:49.574Z"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2026-11-22T11:20:49.574Z",
+      "publishedAt": "2026-11-22T11:20:49.578Z"
+    }
+  ]
+}

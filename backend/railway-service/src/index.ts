@@ -1,0 +1,382 @@
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Station, Train } from '../../../shared/common-types';
+
+const PORT = process.env.PORT || 5002;
+const DATA_FILE = path.resolve(__dirname, '../data/railway.json');
+
+const dataDir = path.dirname(DATA_FILE);
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+interface RailwayStore {
+  stations: Station[];
+  trains: Train[];
+}
+
+function loadData(): RailwayStore {
+  if (!fs.existsSync(DATA_FILE)) {
+    const initialStations: Station[] = [
+      { id: 'stn_mas', code: 'MAS', name: 'Chennai Central', city: 'Chennai', state: 'Tamil Nadu', latitude: 13.0827, longitude: 80.2707 },
+      { id: 'stn_ers', code: 'ERS', name: 'Ernakulam Junction (Kochi)', city: 'Kochi', state: 'Kerala', latitude: 9.9678, longitude: 76.2917 },
+      { id: 'stn_ndls', code: 'NDLS', name: 'New Delhi', city: 'New Delhi', state: 'Delhi', latitude: 28.6415, longitude: 77.2189 },
+      { id: 'stn_csmt', code: 'CSMT', name: 'Chhatrapati Shivaji Maharaj Terminus', city: 'Mumbai', state: 'Maharashtra', latitude: 18.9402, longitude: 72.8356 },
+      { id: 'stn_sbc', code: 'SBC', name: 'KSR Bengaluru', city: 'Bengaluru', state: 'Karnataka', latitude: 12.9784, longitude: 77.5694 },
+      { id: 'stn_jp', code: 'JP', name: 'Jaipur Junction', city: 'Jaipur', state: 'Rajasthan', latitude: 26.9196, longitude: 75.7878 },
+      { id: 'stn_agc', code: 'AGC', name: 'Agra Cantt', city: 'Agra', state: 'Uttar Pradesh', latitude: 27.1591, longitude: 77.9942 },
+      { id: 'stn_bsb', code: 'BSB', name: 'Varanasi Junction', city: 'Varanasi', state: 'Uttar Pradesh', latitude: 25.3283, longitude: 82.9868 },
+      { id: 'stn_mao', code: 'MAO', name: 'Madgaon Junction', city: 'Goa', state: 'Goa', latitude: 15.2747, longitude: 73.9798 },
+      { id: 'stn_cdg', code: 'CDG', name: 'Chandigarh Junction', city: 'Chandigarh', state: 'Punjab / Haryana', latitude: 30.7046, longitude: 76.8286 },
+      { id: 'stn_mys', code: 'MYS', name: 'Mysuru Junction', city: 'Mysuru', state: 'Karnataka', latitude: 12.3164, longitude: 76.6457 },
+      { id: 'stn_udr', code: 'UDZ', name: 'Udaipur City', city: 'Udaipur', state: 'Rajasthan', latitude: 24.5714, longitude: 73.6983 },
+      { id: 'stn_cbe', code: 'CBE', name: 'Coimbatore Junction', city: 'Coimbatore', state: 'Tamil Nadu', latitude: 10.9982, longitude: 76.9634 },
+      { id: 'stn_mdu', code: 'MDU', name: 'Madurai Junction', city: 'Madurai', state: 'Tamil Nadu', latitude: 9.9252, longitude: 78.1118 },
+    ];
+
+    const initialTrains: Train[] = [
+      {
+        id: 'trn_20633',
+        trainNumber: '20633',
+        trainName: 'Vande Bharat Express',
+        sourceStationId: 'stn_mas',
+        sourceStationCode: 'MAS',
+        sourceStationName: 'Chennai Central',
+        destinationStationId: 'stn_ers',
+        destinationStationCode: 'ERS',
+        destinationStationName: 'Ernakulam Junction (Kochi)',
+        departureTime: '06:00',
+        arrivalTime: '14:30',
+        durationMinutes: 510,
+        durationFormatted: '8h 30m',
+        operatingDays: ['MON', 'TUE', 'WED', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 695,
+        isSimulated: true,
+        classes: [
+          { classCode: 'CC', className: 'AC Chair Car', fare: 1580, totalSeats: 120, availableSeats: 48 },
+          { classCode: 'EC', className: 'Executive Anubhuti Chair Car', fare: 2950, totalSeats: 40, availableSeats: 16 },
+        ],
+      },
+      {
+        id: 'trn_12624',
+        trainNumber: '12624',
+        trainName: 'Chennai Mail Superfast',
+        sourceStationId: 'stn_mas',
+        sourceStationCode: 'MAS',
+        sourceStationName: 'Chennai Central',
+        destinationStationId: 'stn_ers',
+        destinationStationCode: 'ERS',
+        destinationStationName: 'Ernakulam Junction (Kochi)',
+        departureTime: '19:00',
+        arrivalTime: '07:30',
+        durationMinutes: 750,
+        durationFormatted: '12h 30m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 695,
+        isSimulated: true,
+        classes: [
+          { classCode: '1A', className: 'AC First Class', fare: 2650, totalSeats: 24, availableSeats: 8 },
+          { classCode: '2A', className: 'AC 2-Tier', fare: 1580, totalSeats: 56, availableSeats: 22 },
+          { classCode: '3A', className: 'AC 3-Tier', fare: 1110, totalSeats: 128, availableSeats: 64 },
+          { classCode: 'SL', className: 'Sleeper Class', fare: 420, totalSeats: 240, availableSeats: 110 },
+        ],
+      },
+      {
+        id: 'trn_12625',
+        trainNumber: '12625',
+        trainName: 'Kerala Express',
+        sourceStationId: 'stn_ndls',
+        sourceStationCode: 'NDLS',
+        sourceStationName: 'New Delhi',
+        destinationStationId: 'stn_ers',
+        destinationStationCode: 'ERS',
+        destinationStationName: 'Ernakulam Junction (Kochi)',
+        departureTime: '20:10',
+        arrivalTime: '17:20',
+        durationMinutes: 2710,
+        durationFormatted: '45h 10m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 2815,
+        isSimulated: true,
+        classes: [
+          { classCode: '2A', className: 'AC 2-Tier', fare: 3750, totalSeats: 48, availableSeats: 14 },
+          { classCode: '3A', className: 'AC 3-Tier', fare: 2580, totalSeats: 160, availableSeats: 52 },
+          { classCode: 'SL', className: 'Sleeper Class', fare: 980, totalSeats: 300, availableSeats: 85 },
+        ],
+      },
+      {
+        id: 'trn_12002',
+        trainNumber: '12002',
+        trainName: 'Bhopal Shatabdi Express',
+        sourceStationId: 'stn_ndls',
+        sourceStationCode: 'NDLS',
+        sourceStationName: 'New Delhi',
+        destinationStationId: 'stn_agc',
+        destinationStationCode: 'AGC',
+        destinationStationName: 'Agra Cantt',
+        departureTime: '06:00',
+        arrivalTime: '07:50',
+        durationMinutes: 110,
+        durationFormatted: '1h 50m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 195,
+        isSimulated: true,
+        classes: [
+          { classCode: 'CC', className: 'AC Chair Car', fare: 650, totalSeats: 140, availableSeats: 62 },
+          { classCode: 'EC', className: 'Executive Class', fare: 1320, totalSeats: 35, availableSeats: 11 },
+        ],
+      },
+      {
+        id: 'trn_12952',
+        trainNumber: '12952',
+        trainName: 'Mumbai Rajdhani Express',
+        sourceStationId: 'stn_ndls',
+        sourceStationCode: 'NDLS',
+        sourceStationName: 'New Delhi',
+        destinationStationId: 'stn_csmt',
+        destinationStationCode: 'CSMT',
+        destinationStationName: 'Mumbai',
+        departureTime: '16:55',
+        arrivalTime: '08:35',
+        durationMinutes: 940,
+        durationFormatted: '15h 40m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 1385,
+        isSimulated: true,
+        classes: [
+          { classCode: '1A', className: 'AC First Class', fare: 4850, totalSeats: 30, availableSeats: 6 },
+          { classCode: '2A', className: 'AC 2-Tier', fare: 2980, totalSeats: 80, availableSeats: 34 },
+          { classCode: '3A', className: 'AC 3-Tier', fare: 2150, totalSeats: 220, availableSeats: 92 },
+        ],
+      },
+      {
+        id: 'trn_22692',
+        trainNumber: '22692',
+        trainName: 'Bengaluru Rajdhani Express',
+        sourceStationId: 'stn_ndls',
+        sourceStationCode: 'NDLS',
+        sourceStationName: 'New Delhi',
+        destinationStationId: 'stn_sbc',
+        destinationStationCode: 'SBC',
+        destinationStationName: 'KSR Bengaluru',
+        departureTime: '20:45',
+        arrivalTime: '05:20',
+        durationMinutes: 2015,
+        durationFormatted: '33h 35m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 2365,
+        isSimulated: true,
+        classes: [
+          { classCode: '1A', className: 'AC First Class', fare: 5400, totalSeats: 24, availableSeats: 4 },
+          { classCode: '2A', className: 'AC 2-Tier', fare: 3450, totalSeats: 70, availableSeats: 28 },
+          { classCode: '3A', className: 'AC 3-Tier', fare: 2490, totalSeats: 180, availableSeats: 71 },
+        ],
+      },
+      {
+        id: 'trn_12986',
+        trainNumber: '12986',
+        trainName: 'Delhi Sarai Rohilla - Jaipur Double Decker',
+        sourceStationId: 'stn_ndls',
+        sourceStationCode: 'NDLS',
+        sourceStationName: 'New Delhi',
+        destinationStationId: 'stn_jp',
+        destinationStationCode: 'JP',
+        destinationStationName: 'Jaipur Junction',
+        departureTime: '17:35',
+        arrivalTime: '22:05',
+        durationMinutes: 270,
+        durationFormatted: '4h 30m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 303,
+        isSimulated: true,
+        classes: [
+          { classCode: 'CC', className: 'AC Chair Car', fare: 590, totalSeats: 210, availableSeats: 104 },
+          { classCode: 'EC', className: 'Executive Class', fare: 1250, totalSeats: 45, availableSeats: 18 },
+        ],
+      },
+      {
+        id: 'trn_12051',
+        trainNumber: '12051',
+        trainName: 'Jan Shatabdi Express',
+        sourceStationId: 'stn_csmt',
+        sourceStationCode: 'CSMT',
+        sourceStationName: 'Mumbai',
+        destinationStationId: 'stn_mao',
+        destinationStationCode: 'MAO',
+        destinationStationName: 'Madgaon Junction (Goa)',
+        departureTime: '05:10',
+        arrivalTime: '14:10',
+        durationMinutes: 540,
+        durationFormatted: '9h 00m',
+        operatingDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+        distanceKm: 580,
+        isSimulated: true,
+        classes: [
+          { classCode: '2S', className: 'Second Seating', fare: 295, totalSeats: 300, availableSeats: 142 },
+          { classCode: 'CC', className: 'AC Chair Car', fare: 1020, totalSeats: 120, availableSeats: 58 },
+          { classCode: 'EV', className: 'Vistadome Coach', fare: 2495, totalSeats: 40, availableSeats: 12 },
+        ],
+      },
+    ];
+
+    const initialStore = { stations: initialStations, trains: initialTrains };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(initialStore, null, 2), 'utf8');
+    return initialStore;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  } catch (e) {
+    return { stations: [], trains: [] };
+  }
+}
+
+function saveData(data: RailwayStore): void {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ service: 'railway-service', status: 'HEALTHY', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/stations', (req: Request, res: Response) => {
+  const store = loadData();
+  const query = (req.query.q as string || '').toLowerCase().trim();
+  let stations = store.stations;
+  if (query) {
+    stations = stations.filter(
+      (s) =>
+        s.code.toLowerCase().includes(query) ||
+        s.name.toLowerCase().includes(query) ||
+        s.city.toLowerCase().includes(query)
+    );
+  }
+  res.json({ success: true, count: stations.length, stations });
+});
+
+app.get('/api/trains/search', (req: Request, res: Response) => {
+  const store = loadData();
+  const { from, to, date, travelClass, sortBy } = req.query as Record<string, string>;
+
+  let results = store.trains;
+
+  if (from) {
+    const fromTerm = from.toLowerCase().trim();
+    results = results.filter(
+      (t) =>
+        t.sourceStationCode.toLowerCase() === fromTerm ||
+        t.sourceStationName.toLowerCase().includes(fromTerm)
+    );
+  }
+
+  if (to) {
+    const toTerm = to.toLowerCase().trim();
+    results = results.filter(
+      (t) =>
+        t.destinationStationCode.toLowerCase() === toTerm ||
+        t.destinationStationName.toLowerCase().includes(toTerm)
+    );
+  }
+
+  if (travelClass && travelClass !== 'ALL') {
+    results = results.filter((t) => t.classes.some((c) => c.classCode === travelClass));
+  }
+
+  // Sorting
+  if (sortBy === 'duration') {
+    results.sort((a, b) => a.durationMinutes - b.durationMinutes);
+  } else if (sortBy === 'departure') {
+    results.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+  } else if (sortBy === 'fare') {
+    results.sort((a, b) => {
+      const minA = Math.min(...a.classes.map((c) => c.fare));
+      const minB = Math.min(...b.classes.map((c) => c.fare));
+      return minA - minB;
+    });
+  }
+
+  res.json({
+    success: true,
+    count: results.length,
+    searchParams: { from, to, date, travelClass, sortBy },
+    isSimulated: true,
+    notice: 'Demonstration railway schedule and seat inventory. Real IRCTC integration not enabled.',
+    trains: results,
+  });
+});
+
+app.get('/api/trains/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  const train = store.trains.find((t) => t.id === req.params.id || t.trainNumber === req.params.id);
+  if (!train) return res.status(404).json({ success: false, message: 'Train not found' });
+  res.json({ success: true, train });
+});
+
+app.get('/api/trains/:id/availability', (req: Request, res: Response) => {
+  const store = loadData();
+  const train = store.trains.find((t) => t.id === req.params.id || t.trainNumber === req.params.id);
+  if (!train) return res.status(404).json({ success: false, message: 'Train not found' });
+  const classCode = req.query.class as string;
+  const targetClass = classCode ? train.classes.find((c) => c.classCode === classCode) : null;
+
+  res.json({
+    success: true,
+    trainId: train.id,
+    trainNumber: train.trainNumber,
+    isSimulated: true,
+    availability: targetClass || train.classes,
+  });
+});
+
+// Admin management endpoints
+app.post('/api/trains', (req: Request, res: Response) => {
+  const store = loadData();
+  const newTrain: Train = {
+    ...req.body,
+    id: `trn_${Date.now()}`,
+    isSimulated: true,
+  };
+  store.trains.push(newTrain);
+  saveData(store);
+  res.status(201).json({ success: true, train: newTrain });
+});
+
+app.put('/api/trains/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  const index = store.trains.findIndex((t) => t.id === req.params.id);
+  if (index === -1) return res.status(404).json({ success: false, message: 'Train not found' });
+  store.trains[index] = { ...store.trains[index], ...req.body };
+  saveData(store);
+  res.json({ success: true, train: store.trains[index] });
+});
+
+app.delete('/api/trains/:id', (req: Request, res: Response) => {
+  const store = loadData();
+  store.trains = store.trains.filter((t) => t.id !== req.params.id);
+  saveData(store);
+  res.json({ success: true, message: 'Train deleted' });
+});
+
+app.post('/api/stations', (req: Request, res: Response) => {
+  const store = loadData();
+  const newStation: Station = {
+    ...req.body,
+    id: `stn_${req.body.code.toLowerCase()}`,
+  };
+  store.stations.push(newStation);
+  saveData(store);
+  res.status(201).json({ success: true, station: newStation });
+});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`[Railway-Service] Server listening on port ${PORT}`);
+  });
+}
+
+export default app;
